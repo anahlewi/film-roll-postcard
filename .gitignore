@@ -1,0 +1,23 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+
+# baked at build time from the CMS
+src/content.generated.json
+
+# sanity studio
+studio/node_modules
+studio/dist
+studio/.sanity
+
+.DS_Store
+*.log
+.vercel
+.env*
+
+# local Claude/editor config
+.claude/

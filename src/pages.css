@@ -1,0 +1,370 @@
+/* Pages around the strip: the maker (/) and the recipient's canister (/r/…).
+   Same committed black; the only colour is the edge-print orange. */
+
+[hidden] {
+  display: none !important;
+}
+
+#app.page {
+  padding: 32px 16px;
+}
+
+/* ---------- shared chrome ---------- */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  font: 700 11px/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background 120ms ease;
+}
+.btn:hover {
+  border-color: var(--print);
+  color: var(--print);
+}
+.btn-primary {
+  border-color: var(--print);
+  background: var(--print);
+  color: var(--black);
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--print);
+}
+.btn-danger:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: progress;
+}
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+.drop:focus-within {
+  outline: 2px solid var(--print);
+  outline-offset: 2px;
+}
+
+.status {
+  min-height: 1.4em;
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.status.is-error {
+  color: var(--error);
+}
+
+/* ---------- maker ---------- */
+.page-make {
+  justify-content: flex-start !important;
+  cursor: auto;
+}
+
+.mast {
+  width: min(560px, 100%);
+  text-align: left;
+}
+.mast-title {
+  margin: 0;
+  font-size: clamp(28px, 7vw, 44px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--print);
+  text-shadow: 0 0 18px rgba(240, 161, 43, 0.35);
+}
+.mast-sub {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.make,
+.done {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 420px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.count {
+  color: var(--print-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--field);
+  color: var(--ink);
+  font: 13px/1.4 var(--font-mono);
+  resize: vertical;
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.32);
+}
+input:hover,
+textarea:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+.drop:hover,
+.drop.is-over {
+  border-color: var(--print);
+  background: rgba(240, 161, 43, 0.05);
+}
+.drop-cta {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--print);
+}
+.drop-sub {
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+/* contact sheet: film-base cells, orange edge numbers */
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sheet:empty {
+  display: none;
+}
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  background: var(--base);
+  border: 1px solid var(--base-2);
+}
+.cell img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+.cell-n {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--print);
+  font-variant-numeric: tabular-nums;
+}
+.cell-tools {
+  display: flex;
+  justify-content: space-between;
+}
+.cell-tools button {
+  appearance: none;
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-dim);
+  font: 12px/1 var(--font-mono);
+  cursor: pointer;
+}
+.cell-tools button:hover:not(:disabled) {
+  color: var(--print);
+}
+.cell-tools button:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.make.is-busy .drop,
+.make.is-busy .cell-tools {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ---------- done ---------- */
+.done-kicker,
+.can-kicker {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--print);
+}
+.done-title {
+  margin: -8px 0 0;
+  font-size: clamp(20px, 5vw, 28px);
+  color: var(--ink);
+  outline: none;
+}
+.share {
+  display: flex;
+  gap: 8px;
+}
+.share-url {
+  flex: 1;
+  min-width: 0;
+  color: var(--print);
+}
+.fine {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+.fine a,
+.make-own {
+  color: var(--ink);
+}
+.done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- recipient ---------- */
+#app.page-view {
+  padding-left: 0;
+  padding-right: 0;
+}
+.stage {
+  display: contents; /* FilmStrip's gate/hint/mute join #app's flex column */
+}
+
+.loading {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.canister {
+  width: min(420px, calc(100% - 32px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  cursor: auto;
+}
+.can-to {
+  margin: 0;
+  font-size: clamp(32px, 9vw, 56px);
+  line-height: 1;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.can-sub {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+.roll-to {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--print);
+}
+
+.roll-note {
+  width: min(460px, calc(100% - 32px));
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--ink);
+  text-align: center;
+  white-space: pre-wrap;
+}
+.roll-note p {
+  margin: 0;
+}
+.roll-note footer {
+  margin-top: 6px;
+  color: var(--ink-dim);
+}
+
+.make-own {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-decoration: none;
+}
+.make-own:hover {
+  color: var(--print);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .drop {
+    transition: none;
+  }
+}
