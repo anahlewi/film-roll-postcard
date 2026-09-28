@@ -2,22 +2,17 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# secrets — .env.example is the only one that belongs in git
 .env
 .env.*
 !.env.example
 
-# baked at build time from the CMS
-src/content.generated.json
-
-# sanity studio
-studio/node_modules
-studio/dist
-studio/.sanity
-
-.DS_Store
-*.log
+# Vercel CLI link
 .vercel
-.env*
 
 # local Claude/editor config
 .claude/
+
+.DS_Store
+*.log
