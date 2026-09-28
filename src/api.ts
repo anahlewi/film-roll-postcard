@@ -7,9 +7,13 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...init,
     headers: { "content-type": "application/json", ...init.headers },
   });
-  // plain `vite` has no /api and answers with index.html — don't mistake that for data
   if (!res.headers.get("content-type")?.includes("application/json")) {
-    throw new Error("The darkroom's offline — run `npm run dev:full` for the API");
+    // plain `vite` has no /api and answers with index.html; a crashed function answers with text
+    throw new Error(
+      import.meta.env.DEV && res.status < 500
+        ? "The darkroom's offline — run `npm run dev:full` for the API"
+        : "The darkroom's having trouble — try again in a minute",
+    );
   }
   const body = await res.json();
   if (!res.ok) throw new Error(body.error ?? `Request failed (${res.status})`);

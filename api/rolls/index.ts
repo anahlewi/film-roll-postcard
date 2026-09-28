@@ -14,13 +14,14 @@ import {
   clean,
   db,
   fail,
+  handler,
   hashToken,
   json,
   makeSlug,
   makeToken,
 } from "../_lib/server.js";
 
-export async function POST(req: Request): Promise<Response> {
+export const POST = handler(async (req: Request): Promise<Response> => {
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -74,4 +75,4 @@ export async function POST(req: Request): Promise<Response> {
     },
     201,
   );
-}
+});

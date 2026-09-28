@@ -3,7 +3,7 @@
  * DELETE /api/rolls/<slug> — sender takes it down (Bearer <deleteToken>)
  */
 import type { Roll } from "../../../src/types.js";
-import { BUCKET, bearer, db, fail, hashToken, json, publicUrl, slugFrom } from "../../_lib/server.js";
+import { BUCKET, bearer, db, fail, handler, hashToken, json, publicUrl, slugFrom } from "../../_lib/server.js";
 
 interface StoredFrame {
   path: string;
@@ -12,7 +12,7 @@ interface StoredFrame {
   alt?: string;
 }
 
-export async function GET(req: Request): Promise<Response> {
+export const GET = handler(async (req: Request): Promise<Response> => {
   const slug = slugFrom(req);
   if (!slug) return fail(404, "No such roll");
 
@@ -45,9 +45,9 @@ export async function GET(req: Request): Promise<Response> {
 
   // short edge cache: a deleted roll disappears within a minute
   return json(roll, 200, { "cache-control": "public, max-age=0, s-maxage=60" });
-}
+});
 
-export async function DELETE(req: Request): Promise<Response> {
+export const DELETE = handler(async (req: Request): Promise<Response> => {
   const slug = slugFrom(req);
   const token = bearer(req);
   if (!slug || !token) return fail(400, "Missing roll or token");
@@ -65,4 +65,4 @@ export async function DELETE(req: Request): Promise<Response> {
   await db().from("rolls").delete().eq("id", roll.id);
 
   return json({ deleted: true });
-}
+});

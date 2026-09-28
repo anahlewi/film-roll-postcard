@@ -13,6 +13,7 @@ import {
   clean,
   db,
   fail,
+  handler,
   hashToken,
   json,
   slugFrom,
@@ -25,7 +26,7 @@ interface FrameIn {
   alt?: unknown;
 }
 
-export async function POST(req: Request): Promise<Response> {
+export const POST = handler(async (req: Request): Promise<Response> => {
   const slug = slugFrom(req);
   const token = bearer(req);
   if (!slug || !token) return fail(400, "Missing roll or token");
@@ -71,7 +72,7 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   return json({ slug, frames: frames.length });
-}
+});
 
 function clampInt(v: unknown, lo: number, hi: number, fallback: number): number {
   const n = Math.round(Number(v));

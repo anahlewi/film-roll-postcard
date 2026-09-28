@@ -14,11 +14,28 @@ export const LIMITS = { recipient: 40, sender: 40, note: 280, alt: 140 } as cons
 
 let client: SupabaseClient | undefined;
 
+class ConfigError extends Error {}
+
+/**
+ * Wrap a handler so a throw becomes a JSON 500 instead of Vercel's plain-text
+ * crash page — the browser can then show a real message, and the log says why.
+ */
+export function handler(fn: (req: Request) => Promise<Response>) {
+  return async (req: Request): Promise<Response> => {
+    try {
+      return await fn(req);
+    } catch (e) {
+      console.error(`[${req.method} ${new URL(req.url).pathname}]`, e);
+      return fail(500, e instanceof ConfigError ? "The darkroom isn't set up yet" : "Something went wrong");
+    }
+  };
+}
+
 export function db(): SupabaseClient {
   if (client) return client;
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set");
+  if (!url || !key) throw new ConfigError("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set");
   client = createClient(url, key, { auth: { persistSession: false } });
   return client;
 }
