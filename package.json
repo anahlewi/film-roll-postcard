@@ -7,8 +7,6 @@
   "scripts": {
     "dev": "vite",
     "dev:full": "vercel dev",
-    "content": "tsx scripts/fetch-content.ts",
-    "prebuild": "tsx scripts/fetch-content.ts || echo \"(no CMS env — building with the seed roll)\"",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
@@ -18,7 +16,6 @@
     "gsap": "^3.13.0"
   },
   "devDependencies": {
-    "@sanity/client": "^6.24.1",
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",

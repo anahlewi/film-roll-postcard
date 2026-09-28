@@ -1,5 +1,5 @@
-export interface SanityImage {
-  /** bare Sanity CDN asset URL — transforms are appended at runtime */
+export interface FrameImage {
+  /** public URL — shared rolls are pre-resized to ~1800px on upload */
   url: string;
   width: number;
   height: number;
@@ -16,7 +16,7 @@ export interface Frame {
   /** free text, e.g. "f/2 · 1/125 · ISO 400" — feeds the rebate markings */
   exposure?: string;
   shotAt?: string;
-  image?: SanityImage;
+  image?: FrameImage;
 }
 
 export interface Roll {

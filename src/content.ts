@@ -1,15 +1,6 @@
 import type { Roll } from "./types";
 
-/**
- * `npm run content` writes src/content.generated.json from Sanity.
- * When it's absent (fresh clone, no CMS env) we fall back to a seed roll so
- * `npm run dev` still runs. import.meta.glob with no match just yields {}.
- */
-const generated = import.meta.glob<Roll>("./content.generated.json", {
-  eager: true,
-  import: "default",
-});
-
+/** The sample roll behind /demo — for working on the strip without the API. */
 const seedImages: Record<number, { url: string; width: number; height: number }> = {
   1: {
     url: "https://cdn.cosmos.so/51215b46-aa0d-4026-9180-18e93cfa619c",
@@ -53,4 +44,4 @@ function seedRoll(): Roll {
   };
 }
 
-export const roll: Roll = (Object.values(generated)[0] as Roll | undefined) ?? seedRoll();
+export const roll: Roll = seedRoll();

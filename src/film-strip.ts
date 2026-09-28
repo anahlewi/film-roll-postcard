@@ -3,7 +3,6 @@ import { Draggable } from "gsap/Draggable";
 import { InertiaPlugin } from "gsap/InertiaPlugin";
 
 import type { Roll } from "./types";
-import { buildSrcSet, transform, IMG_SIZES } from "./image";
 import { playShutter } from "./audio";
 import { edgeBottom, edgeTopDecor } from "./edge-print";
 
@@ -249,12 +248,10 @@ export class FilmStrip {
       if (this.loaded.has(n)) continue;
       const el = this.frameEls[n - 1];
       const img = el?.querySelector<HTMLImageElement>("img");
-      const base = img?.dataset.src;
-      if (!img || !base) continue;
+      const src = img?.dataset.src;
+      if (!img || !src) continue;
 
-      img.srcset = buildSrcSet(base) ?? "";
-      img.sizes = IMG_SIZES;
-      img.src = transform(base, 640);
+      img.src = src;
       img.addEventListener("load", () => el.querySelector(".win")?.classList.add("is-loaded"), {
         once: true,
       });
