@@ -27,9 +27,15 @@ export class FilmStrip {
   private status!: HTMLElement;
   private hint!: HTMLElement;
   private muteBtn!: HTMLButtonElement;
+  private lightbox!: HTMLDialogElement;
+  private lbImg!: HTMLImageElement;
+  private lbCaption!: HTMLElement;
+  private lbFrame = 0; // frame shown in the lightbox, 0 when closed
+  private lbClosing = false;
 
   private frameEls: HTMLElement[] = [];
   private numberEls: HTMLButtonElement[] = [];
+  private winEls: HTMLElement[] = [];
   private readonly loaded = new Set<number>();
 
   private selected = 1;
@@ -72,7 +78,7 @@ export class FilmStrip {
              aria-label="Film strip, frame numbers 1 to ${this.total}"></div>
         <div class="flash" aria-hidden="true"></div>
       </div>
-      <p class="hint">Click a frame number, drag the strip, or use the arrow keys</p>
+      <p class="hint">Click a frame number or drag the strip · click a photo to enlarge</p>
       <button class="mute" type="button" aria-pressed="true" aria-label="Shutter sound">
         <svg class="i-on" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
@@ -83,12 +89,24 @@ export class FilmStrip {
         </svg>
       </button>
       <p class="sr-only" role="status" aria-live="polite"></p>
+      <dialog class="lightbox" aria-label="Enlarged photo">
+        <figure class="lb-figure">
+          <img class="lb-img" alt="" />
+          <figcaption class="lb-caption"></figcaption>
+        </figure>
+        <button class="lb-close" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </dialog>
     `;
     this.strip = mount.querySelector<HTMLElement>(".strip")!;
     this.flash = mount.querySelector<HTMLElement>(".flash")!;
     this.hint = mount.querySelector<HTMLElement>(".hint")!;
     this.muteBtn = mount.querySelector<HTMLButtonElement>(".mute")!;
     this.status = mount.querySelector<HTMLElement>('[role="status"]')!;
+    this.lightbox = mount.querySelector<HTMLDialogElement>(".lightbox")!;
+    this.lbImg = mount.querySelector<HTMLImageElement>(".lb-img")!;
+    this.lbCaption = mount.querySelector<HTMLElement>(".lb-caption")!;
     this.syncMuteBtn();
   }
 
@@ -123,6 +141,12 @@ export class FilmStrip {
         img.height = f.image.height;
         img.dataset.src = f.image.url;
         win.appendChild(img);
+        // a div, not a <button>, so Draggable still grabs the strip from a photo
+        win.classList.add("has-image");
+        win.dataset.n = String(n);
+        win.setAttribute("role", "button");
+        win.setAttribute("aria-label", `Enlarge frame ${n}`);
+        win.tabIndex = n === 1 ? 0 : -1;
       } else {
         win.setAttribute("aria-hidden", "true"); // blank prototype window
       }
@@ -131,6 +155,7 @@ export class FilmStrip {
       frag.appendChild(frame);
       this.frameEls.push(frame);
       this.numberEls.push(btn);
+      this.winEls.push(win);
     });
 
     this.strip.appendChild(frag);
@@ -147,6 +172,11 @@ export class FilmStrip {
       bounds: { minX: 0, maxX: 0 }, // real bounds set in measure()
       snap: { x: (value: number) => this.snapValue(value) },
       onPress: () => this.dismissHint(),
+      // only fires when the press didn't turn into a drag
+      onClick: (e: Event) => {
+        const win = (e.target as HTMLElement).closest<HTMLElement>(".win[data-n]");
+        if (win) this.openLightbox(Number(win.dataset.n));
+      },
       onDrag: () => this.trackBlur(),
       onThrowUpdate: () => this.trackBlur(),
       onDragEnd: () => this.settleFromX(),
@@ -266,6 +296,9 @@ export class FilmStrip {
       b.setAttribute("aria-current", on ? "true" : "false");
       b.tabIndex = on ? 0 : -1;
     });
+    this.winEls.forEach((w, i) => {
+      if (w.dataset.n) w.tabIndex = i + 1 === this.selected ? 0 : -1;
+    });
 
     const f = this.roll.frames[this.selected - 1];
     const note = f?.caption ?? f?.alt ?? "";
@@ -283,6 +316,12 @@ export class FilmStrip {
     });
 
     this.strip.addEventListener("keydown", (e) => {
+      const win = (e.target as HTMLElement).closest<HTMLElement>(".win[data-n]");
+      if (win && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        this.openLightbox(Number(win.dataset.n));
+        return;
+      }
       const moves: Record<string, number> = {
         ArrowRight: this.selected + 1,
         ArrowDown: this.selected + 1,
@@ -299,6 +338,21 @@ export class FilmStrip {
 
     this.muteBtn.addEventListener("click", () => this.toggleMute());
 
+    // any click in the lightbox (photo, backdrop or ×) closes it
+    this.lightbox.addEventListener("click", () => this.closeLightbox());
+    this.lightbox.addEventListener("cancel", (e) => {
+      e.preventDefault(); // Esc — run the close animation instead of snapping shut
+      this.closeLightbox();
+    });
+    this.lightbox.addEventListener("close", () => {
+      gsap.killTweensOf([this.lightbox, this.lbImg, this.lbCaption]);
+      gsap.set([this.lightbox, this.lbImg, this.lbCaption], { clearProps: "all" });
+      const n = this.lbFrame;
+      this.lbFrame = 0;
+      this.lbClosing = false;
+      if (n) this.winEls[n - 1]?.focus();
+    });
+
     addEventListener("hashchange", () => {
       const n = this.clampSel(this.readHash());
       if (n !== this.selected) this.goTo(n);
@@ -310,6 +364,66 @@ export class FilmStrip {
     });
 
     this.reduceMQ.addEventListener?.("change", () => this.snapTo(this.targetX()));
+  }
+
+  /* ------------------------------------------------------------ lightbox */
+
+  private openLightbox(n: number): void {
+    const f = this.roll.frames[n - 1];
+    if (!f?.image || this.lbFrame) return;
+    this.dismissHint();
+    this.lbFrame = n;
+
+    this.lbImg.src = f.image.url;
+    this.lbImg.alt = f.alt;
+    this.lbImg.width = f.image.width;
+    this.lbImg.height = f.image.height;
+    const bits = [f.code || String(n), f.caption, f.exposure].filter(Boolean);
+    this.lbCaption.textContent = bits.join(" · ");
+
+    this.lightbox.showModal();
+    if (this.reduceMQ.matches) return;
+
+    // grow out of the thumbnail
+    const from = this.winEls[n - 1].getBoundingClientRect();
+    const to = this.lbImg.getBoundingClientRect();
+    gsap.fromTo(
+      this.lightbox,
+      { backgroundColor: "rgba(0,0,0,0)" },
+      { backgroundColor: "rgba(0,0,0,0.94)", duration: 0.35, ease: "power1.out" },
+    );
+    gsap.fromTo(
+      this.lbImg,
+      {
+        x: from.left + from.width / 2 - (to.left + to.width / 2),
+        y: from.top + from.height / 2 - (to.top + to.height / 2),
+        scale: from.width / to.width,
+        opacity: 0.5,
+      },
+      { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" },
+    );
+    gsap.fromTo(this.lbCaption, { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.25 });
+  }
+
+  private closeLightbox(): void {
+    const n = this.lbFrame;
+    if (!n || this.lbClosing) return;
+    this.lbClosing = true;
+    if (this.reduceMQ.matches) return this.lightbox.close();
+
+    const from = this.lbImg.getBoundingClientRect();
+    const to = this.winEls[n - 1].getBoundingClientRect();
+    gsap.to(this.lbCaption, { opacity: 0, duration: 0.12 });
+    gsap.to(this.lightbox, { backgroundColor: "rgba(0,0,0,0)", duration: 0.3, ease: "power1.in" });
+    gsap.to(this.lbImg, {
+      x: to.left + to.width / 2 - (from.left + from.width / 2),
+      y: to.top + to.height / 2 - (from.top + from.height / 2),
+      scale: to.width / from.width,
+      opacity: 0,
+      duration: 0.35,
+      ease: "power2.in",
+      onComplete: () => this.lightbox.close(),
+    });
   }
 
   private toggleMute(): void {

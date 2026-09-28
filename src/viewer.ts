@@ -31,7 +31,7 @@ export async function mountViewer(mount: HTMLElement, slug: string): Promise<voi
     return;
   }
 
-  document.title = `A roll for ${roll.to ?? "you"} — Roll 24`;
+  document.title = `A roll for ${roll.to ?? "you"} — Film Roll Postcard`;
   mountRoll(mount, roll);
 }
 

@@ -330,3 +330,86 @@ body {
     transition: none;
   }
 }
+
+/* ---------- lightbox: click a photo to enlarge ---------- */
+.win.has-image {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.94);
+  color: var(--ink);
+  cursor: zoom-out;
+}
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+.lightbox::backdrop {
+  background: transparent;
+}
+
+.lb-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.lb-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, 1400px);
+  max-height: calc(100dvh - 96px);
+  border-radius: var(--radius);
+  will-change: transform, opacity;
+}
+.lb-caption {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--print);
+}
+.lb-caption:empty {
+  display: none;
+}
+
+.lb-close {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--ink);
+  cursor: pointer;
+}
+.lb-close:hover,
+.lb-close:focus-visible {
+  border-color: var(--print);
+}
+.lb-close svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}

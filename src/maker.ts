@@ -20,8 +20,8 @@ export function mountMaker(mount: HTMLElement): void {
   mount.className = "page page-make";
   mount.innerHTML = `
     <header class="mast">
-      <h1 class="mast-title">Roll 24</h1>
-      <p class="mast-sub">Load a roll for someone.</p>
+      <h1 class="mast-title">Film Roll Postcard</h1>
+      <p class="mast-sub">Load a film roll and share memories with your loved ones.</p>
     </header>
 
     <form class="make" novalidate>

@@ -84,7 +84,7 @@ textarea:focus-visible,
 }
 .mast-title {
   margin: 0;
-  font-size: clamp(28px, 7vw, 44px);
+  font-size: clamp(28px, 7vw, 38px);
   font-weight: 700;
   line-height: 1;
   color: var(--print);

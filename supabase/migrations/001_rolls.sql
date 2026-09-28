@@ -1,4 +1,4 @@
--- Roll 24 — shareable rolls.
+-- Film Roll Postcard — shareable rolls.
 -- Paste into Supabase → SQL Editor → Run (or `supabase db push`).
 --
 -- Access model: the browser never talks to Supabase directly. Every read and

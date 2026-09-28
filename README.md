@@ -1,4 +1,4 @@
-# Roll 24 — a film roll postcard
+# Film Roll Postcard
 
 Load a roll of photos onto a 35mm contact strip and send it to one person.
 They get a private link, open the canister, and wind through the frames —
