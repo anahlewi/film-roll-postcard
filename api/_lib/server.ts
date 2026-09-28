@@ -9,7 +9,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export const BUCKET = "rolls";
-export const MAX_FRAMES = 36;
+export const MAX_FRAMES = 10;
 export const LIMITS = { recipient: 40, sender: 40, note: 280, alt: 140 } as const;
 
 let client: SupabaseClient | undefined;

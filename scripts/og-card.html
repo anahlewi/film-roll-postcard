@@ -1,0 +1,96 @@
+<!doctype html>
+<!--
+  Source for public/og.png, the link-preview image (1200×630).
+  Regenerate from the project root with:
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
+      --window-size=1200,630 --virtual-time-budget=4000 \
+      --screenshot=public/og.png "file://$PWD/scripts/og-card.html"
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=block" />
+    <link rel="stylesheet" href="../src/tokens.css" />
+    <link rel="stylesheet" href="../src/styles.css" />
+    <style>
+      :root {
+        --frame-w: 262px;
+        --gap: 9px;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        cursor: default;
+      }
+      .card {
+        height: 630px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 34px;
+      }
+      .title {
+        margin: 0;
+        font-size: 64px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--print);
+        text-shadow: 0 0 22px rgba(240, 161, 43, 0.45);
+      }
+      .tag {
+        margin: -18px 0 0;
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+      }
+      .strip {
+        animation: none;
+      }
+      .foot {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ghost);
+      }
+      /* warm, photo-ish tints so the windows read as exposures, not blanks */
+      .frame:nth-child(1) .win { background: linear-gradient(135deg, #e6b17a, #7a4a2a); }
+      .frame:nth-child(2) .win { background: linear-gradient(160deg, #9cc3d6, #2f4a5c); }
+      .frame:nth-child(3) .win { background: linear-gradient(120deg, #e7d38f, #8a6a3a); }
+      .frame:nth-child(4) .win { background: linear-gradient(150deg, #d99a9a, #5c2f3a); }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1 class="title">Film Roll Postcard</h1>
+      <p class="tag">Load a film roll and share it with someone</p>
+      <div class="gate">
+        <div class="strip" id="strip"></div>
+      </div>
+      <p class="foot">film-roll-postcard.vercel.app</p>
+    </div>
+    <script>
+      const strip = document.getElementById("strip");
+      for (let n = 1; n <= 4; n++) {
+        strip.insertAdjacentHTML(
+          "beforeend",
+          `<div class="frame">
+             <div class="edge edge-top">
+               <span class="num"${n === 1 ? ' aria-current="true"' : ""}>${n}</span>
+               <span class="numA">${n}A</span><span class="barcode"></span><span class="iso">400</span>
+             </div>
+             <div class="win"></div>
+             <div class="edge edge-bot">
+               <span class="dashes"></span><span class="maker">OKROMA 400</span><span class="arrow">→ ${n}A</span>
+             </div>
+           </div>`,
+        );
+      }
+    </script>
+  </body>
+</html>

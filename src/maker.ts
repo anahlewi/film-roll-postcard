@@ -2,7 +2,7 @@ import { publishRoll, startRoll, upload } from "./api";
 import { develop, type Developed } from "./process-image";
 import { playShutter } from "./audio";
 
-const MAX_FRAMES = 36;
+const MAX_FRAMES = 10;
 const MINE_KEY = "roll24:mine";
 
 interface Shot extends Developed {
@@ -46,7 +46,7 @@ export function mountMaker(mount: HTMLElement): void {
         <label class="drop">
           <input type="file" name="photos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple class="sr-only" />
           <span class="drop-cta">+ Add photos</span>
-          <span class="drop-sub">or drop them here</span>
+          <span class="drop-sub">or drop them here · ${MAX_FRAMES} max</span>
         </label>
         <ol class="sheet" aria-label="Contact sheet — frame order"></ol>
       </div>
@@ -116,7 +116,13 @@ export function mountMaker(mount: HTMLElement): void {
         errors.push((e as Error).message);
       }
     }
-    if (list.length > room) errors.push(`Only room for ${room} more — the rest were left out.`);
+    if (list.length > room) {
+      errors.push(
+        room === MAX_FRAMES
+          ? `A roll holds ${MAX_FRAMES} photos — added the first ${MAX_FRAMES}.`
+          : `Only room for ${room} more — the rest were left out.`,
+      );
+    }
     say(errors.join(" "), errors.length > 0);
   }
 

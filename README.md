@@ -9,7 +9,7 @@ stutter and a synthesized shutter click.
 
 | Route       | What it is                                                             |
 | ----------- | ---------------------------------------------------------------------- |
-| `/`         | Load a roll: to / from / note, 1–36 photos, reorder, get a link         |
+| `/`         | Load a roll: to / from / note, 1–10 photos, reorder, get a link         |
 | `/r/<slug>` | The recipient's side: sealed canister → **Open** → the strip + note     |
 | `/r/<slug>#delete=<token>` | The sender's take-back link — deletes the roll and photos |
 | `/demo`     | A sample roll, for working on the strip without the API                 |
